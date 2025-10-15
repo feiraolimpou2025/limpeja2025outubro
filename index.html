@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Análise</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="icon" href="https://i.ibb.co/YFpLHQFb/1.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: #f4f6f9;
+      color: #212529;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .presell-container {
+      max-width: 550px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px;
+      box-sizing: border-box;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeIn 1s forwards ease-out;
+      transition: transform 0.6s ease-in, opacity 0.6s ease-in;
+    }
+
+    .presell-container.exiting {
+      transform: translateY(-50px);
+      opacity: 0;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    p.subtitle {
+      font-size: 1.1rem;
+      color: #5a5a5a;
+      line-height: 1.5;
+      margin-bottom: 40px;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      background-color: #e9ecef;
+      border-radius: 50px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      border: 1px solid #dee2e6;
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 28px;
+      background: linear-gradient(90deg, #e05998, #FF3194);
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 15px;
+      color: #FFF;
+      transition: width 2.5s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .progress-status {
+      font-weight: 400;
+      color: #FF3194;
+      height: 25px;
+      font-size: 1rem;
+      transition: opacity 0.5s ease-in-out;
+    }
+
+    .cta-button {
+      display: block;
+      width: 100%;
+      padding: 15px 0; 
+      margin-top: 30px;
+      background: linear-gradient(90deg, #e05998, #FF3194);
+      color: #ffffff;
+      font-size: 1.25rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 20px rgba(245, 124, 0, 0.35);
+
+      visibility: hidden;
+      opacity: 0;
+      transform: scale(0.95);
+      transition: all 0.5s ease-out 0.2s;
+    }
+
+    .cta-button.visible {
+      visibility: visible;
+      opacity: 1;
+      transform: scale(1);
+      animation: pulse 2s infinite 1s;
+    }
+
+    .cta-button:hover {
+      filter: brightness(1.1);
+      transform: scale(1.02);
+      animation: none;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); box-shadow: 0 4px 20px rgba(245, 124, 0, 0.35); }
+      50% { transform: scale(1.03); box-shadow: 0 8px 30px rgba(245, 124, 0, 0.45); }
+      100% { transform: scale(1); box-shadow: 0 4px 20px rgba(245, 124, 0, 0.35); }
+    }
+
+    #loader-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(244, 246, 249, 0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.4s ease-in-out, visibility 0.4s ease-in-out;
+    }
+
+    #loader-overlay.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 5px solid #d0d0d0;
+      border-top-color: #FF3194;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="presell-container" id="presellContainer">
+    <h1>Sua análise está sendo preparada...</h1>
+    <p class="subtitle">Clique no botão para iniciar sua análise!</p>
+
+    <div class="progress-bar-container">
+      <div id="progressBar" class="progress-bar"></div>
+    </div>
+    <div id="progressStatus" class="progress-status">Analisando dados...</div>
+
+    <a id="ctaButton" href="https://feiraodeoutubro2025.github.io/k2025/" class="cta-button">
+      Efetuar Análise
+    </a>
+  </div>
+
+  <div id="loader-overlay">
+    <div class="spinner"></div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const progressBar = document.getElementById('progressBar');
+      const progressStatus = document.getElementById('progressStatus');
+      const ctaButton = document.getElementById('ctaButton');
+      const presellContainer = document.getElementById('presellContainer');
+      const loaderOverlay = document.getElementById('loader-overlay');
+
+      const animationDuration = 2500;
+
+      setTimeout(() => {
+        progressBar.style.width = '100%';
+
+        let currentPercent = 0;
+        const interval = setInterval(() => {
+          if (currentPercent < 100) {
+            currentPercent++;
+            progressBar.textContent = `${currentPercent}%`;
+          } else {
+            clearInterval(interval);
+          }
+        }, animationDuration / 100);
+      }, 100);
+
+      setTimeout(() => {
+        progressStatus.style.opacity = '0';
+        setTimeout(() => {
+          progressStatus.textContent = 'Análise Pronta!';
+          progressStatus.style.opacity = '1';
+        }, 400);
+
+        ctaButton.classList.add('visible');
+      }, animationDuration);
+
+      ctaButton.addEventListener('click', function (event) {
+        event.preventDefault();
+        const destinationUrl = this.href;
+
+        presellContainer.classList.add('exiting');
+        loaderOverlay.classList.add('visible');
+
+        setTimeout(() => {
+          window.location.href = destinationUrl;
+        }, 1500);
+      });
+    });
+  </script>
+
+</body>
+</html>
